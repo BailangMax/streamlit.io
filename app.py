@@ -16,8 +16,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 # Environment variables
 UPLOAD_URL = os.environ.get('UPLOAD_URL', '')        # 节点或订阅上传地址,只填写这个地址将上传节点,同时填写PROJECT_URL将上传订阅，例如：https://merge.serv00.net
-PROJECT_URL = os.environ.get('PROJECT_URL', '')      # 项目url,需要自动保活或自动上传订阅需要填写,例如：https://www.google.com,
-AUTO_ACCESS = os.environ.get('AUTO_ACCESS', 'false').lower() == 'false'  # false关闭自动保活, true开启自动保活，默认关闭
+PROJECT_URL = os.environ.get('PROJECT_URL', 'https://appio-6xcwip37lhbdnhi9f9aptk.streamlit.app/')      # 项目url,需要自动保活或自动上传订阅需要填写,例如：https://www.google.com,
+AUTO_ACCESS = os.environ.get('AUTO_ACCESS', 'true').lower() == 'false'  # false关闭自动保活, true开启自动保活，默认关闭
 FILE_PATH = os.environ.get('FILE_PATH', './.cache')    # 运行路径,sub.txt保存路径
 SUB_PATH = os.environ.get('SUB_PATH', 'sub')            # 订阅token,默认sub，例如：https://www.google.com/sub
 UUID = os.environ.get('UUID', 'ff24ebc4-8b2f-4eae-a40b-0fe47473541f')  # UUID,如使用哪吒v1,在不同的平台部署需要修改,否则会覆盖
@@ -26,10 +26,10 @@ NEZHA_PORT = os.environ.get('NEZHA_PORT', '')           # v1哪吒请留空, v0�
 NEZHA_KEY = os.environ.get('NEZHA_KEY', 'NwxKJwM9UKRCX5TBPaBm0IrjNCSyflif')            # v1哪吒的NZ_CLIENT_SECRET或v0哪吒agent密钥
 ARGO_DOMAIN = os.environ.get('ARGO_DOMAIN', '')      # Argo固定隧道域名,留空即使用临时隧道
 ARGO_AUTH = os.environ.get('ARGO_AUTH', '')          # Argo固定隧道密钥,留空即使用临时隧道
-ARGO_PORT = int(os.environ.get('ARGO_PORT', '8068'))    # Argo端口,使用固定隧道token需在cloudflare后台设置端口和这里一致
+ARGO_PORT = int(os.environ.get('ARGO_PORT', '8001'))    # Argo端口,使用固定隧道token需在cloudflare后台设置端口和这里一致
 CFIP = os.environ.get('CFIP', 'www.visa.com.tw')        # 优选ip或优选域名
 CFPORT = int(os.environ.get('CFPORT', '443'))         # 优选ip或优选域名对应端口
-NAME = os.environ.get('NAME', 'Vls')                # 节点名称
+NAME = os.environ.get('NAME', 'streamlit.io')                # 节点名称
 CHAT_ID = os.environ.get('CHAT_ID', '7627328147')               # Telegram chat_id,推送节点到tg,两个变量同时填写才会推送
 BOT_TOKEN = os.environ.get('BOT_TOKEN', '8337759907:AAGvmCiBeS2G_RXiNEUHYa4cdxn119nzV44')           # Telegram bot_token
 PORT = int(os.environ.get('SERVER_PORT') or os.environ.get('PORT') or 3000) # 订阅端口，如无法订阅，请手动修改为分配的端口
