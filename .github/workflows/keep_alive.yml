@@ -1,0 +1,22 @@
+name: Keep Streamlit App Alive
+
+on:
+  # 每天运行两次 (例如 02:00 UTC 和 14:00 UTC)
+  schedule:
+    - cron: '0 2,14 * * *' 
+  # 允许手动运行
+  workflow_dispatch:
+
+jobs:
+  ping-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send request to Streamlit App
+        env:
+          # 将这里的 URL 替换为你应用的实际链接
+          APP_URL: https://axxsxx.streamlit.app/ 
+        run: |
+          echo "Pinging app: $APP_URL"
+          # 使用 curl 发送请求，-s 静默，-o /dev/null 丢弃输出，-w 打印 HTTP 状态码
+          curl -s -o /dev/null -w "%{http_code}\\n" $APP_URL
+          echo "App pinged successfully."
