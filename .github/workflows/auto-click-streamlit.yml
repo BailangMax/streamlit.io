@@ -36,8 +36,9 @@ jobs:
         with:
           context: .
           push: true
+          # 🛑 关键修改：使用 lower() 函数确保所有者名称是小写
           tags: |
-            ghcr.io/${{ github.repository_owner }}/python:latest
+            ghcr.io/${{ toLower(github.repository_owner) }}/python:latest
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Python Server
