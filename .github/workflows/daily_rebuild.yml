@@ -12,9 +12,14 @@ jobs:
   rebuild:
     runs-on: ubuntu-latest
 
+    # vvvvvv 请在这里添加下面 2 行 vvvvvv
+    permissions:
+      contents: write
+    # ^^^^^^ 上面 2 行是新添加的 ^^^^^^
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # 建议使用 @v4 (最新版)
 
       - name: Set up Git
         run: |
@@ -27,7 +32,6 @@ jobs:
           git push
 
       - name: Send Telegram notification on success
-        # 仅在前面的步骤都成功时运行
         if: success()
         uses: appleboy/telegram-action@master
         with:
@@ -40,7 +44,6 @@ jobs:
             触发时间: 北京时间 03:00
 
       - name: Send Telegram notification on failure
-        # 仅在有步骤失败时运行
         if: failure()
         uses: appleboy/telegram-action@master
         with:
