@@ -1,22 +1,52 @@
-name: Keep Streamlit App Alive
+name: Streamlit Daily Rebuild with Notification
 
 on:
-  # 每天运行两次 (例如 02:00 UTC 和 14:00 UTC)
   schedule:
-    - cron: '0 2,14 * * *' 
-  # 允许手动运行
+    # 北京时间每日凌晨 3:00 (即 UTC 19:00)
+    - cron: '0 19 * * *'
+  
+  # 允许您手动在 Actions 标签页触发此工作流
   workflow_dispatch:
 
 jobs:
-  ping-app:
+  rebuild:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Send request to Streamlit App
-        env:
-          # 将这里的 URL 替换为你应用的实际链接
-          APP_URL: https://axxsxx.streamlit.app/ 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
         run: |
-          echo "Pinging app: $APP_URL"
-          # 使用 curl 发送请求，-s 静默，-o /dev/null 丢弃输出，-w 打印 HTTP 状态码
-          curl -s -o /dev/null -w "%{http_code}\\n" $APP_URL
-          echo "App pinged successfully."
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Create empty commit and push
+        run: |
+          git commit --allow-empty -m "Trigger daily rebuild"
+          git push
+
+      - name: Send Telegram notification on success
+        # 仅在前面的步骤都成功时运行
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            ✅ Streamlit 应用重建任务成功！
+            
+            应用链接: https://axxsxx.streamlit.app/
+            触发时间: 北京时间 03:00
+
+      - name: Send Telegram notification on failure
+        # 仅在有步骤失败时运行
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            ❌ Streamlit 应用重建任务失败！
+            
+            请检查 GitHub Actions 日志获取详情。
