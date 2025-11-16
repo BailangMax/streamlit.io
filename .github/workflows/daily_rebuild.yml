@@ -12,6 +12,7 @@ jobs:
   rebuild:
     runs-on: ubuntu-latest
 
+    # 必须添加此权限，才能让 action 推送（push）空提交
     permissions:
       contents: write
 
@@ -30,18 +31,20 @@ jobs:
           git commit --allow-empty -m "Trigger daily rebuild"
           git push
 
-      # vvvvvv 这是新添加的步骤 vvvvvv
+      # vvvvvv 这是您缺失的、用于唤醒APP的关键步骤 vvvvvv
       - name: Wake up app by visiting URL
         # 此步骤模拟访问以将应用从休眠中唤醒。
-        # 我们添加 'continue-on-error: true' 是因为
-        # 即使应用返回 "Zzzz" 页面（技术上可能是个错误），
-        # 这个访问请求本身就已经达到了唤醒它的目的。
+        # 'continue-on-error: true' 确保即使访问失败（例如应用正在启动中）
+        # 也不会导致整个工作流失败，因为访问的目的已经达到了。
         continue-on-error: true
         run: |
+          # 访问您的 URL 来唤醒应用
+          # !! 请确保这里的 URL 是您自己的 Streamlit APP 链接 !!
           curl -s https://axxsxx.streamlit.app/ > /dev/null
       # ^^^^^^ 上面是新添加的步骤 ^^^^^^
 
       - name: Send Telegram notification on success
+        # 仅在前面步骤都成功时运行
         if: success()
         uses: appleboy/telegram-action@master
         with:
@@ -56,6 +59,7 @@ jobs:
             (如果是手动触发，则时间显示为空)
 
       - name: Send Telegram notification on failure
+        # 仅在前面任何步骤失败时运行
         if: failure()
         uses: appleboy/telegram-action@master
         with:
