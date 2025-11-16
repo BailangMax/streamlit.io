@@ -6,14 +6,12 @@ on:
     - cron: '0 7,19 * * *'
   
   # 允许您手动在 Actions 标签页触发此工作流
-  # 这行是让 "Run workflow" 按钮显示出来的关键
   workflow_dispatch:
 
 jobs:
   rebuild:
     runs-on: ubuntu-latest
 
-    # 必须添加此权限，才能让 action 推送（push）空提交
     permissions:
       contents: write
 
@@ -32,15 +30,25 @@ jobs:
           git commit --allow-empty -m "Trigger daily rebuild"
           git push
 
+      # vvvvvv 这是新添加的步骤 vvvvvv
+      - name: Wake up app by visiting URL
+        # 此步骤模拟访问以将应用从休眠中唤醒。
+        # 我们添加 'continue-on-error: true' 是因为
+        # 即使应用返回 "Zzzz" 页面（技术上可能是个错误），
+        # 这个访问请求本身就已经达到了唤醒它的目的。
+        continue-on-error: true
+        run: |
+          curl -s https://axxsxx.streamlit.app/ > /dev/null
+      # ^^^^^^ 上面是新添加的步骤 ^^^^^^
+
       - name: Send Telegram notification on success
-        # 仅在前面步骤都成功时运行
         if: success()
         uses: appleboy/telegram-action@master
         with:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           to: ${{ secrets.TELEGRAM_TO }}
           message: |
-            ✅ Streamlit 应用重建任务成功！
+            ✅ Streamlit 应用重建和唤醒任务成功！
             
             应用链接: https://axxsxx.streamlit.app/
             触发时间: (UTC ${{ github.event.schedule }})
@@ -48,7 +56,6 @@ jobs:
             (如果是手动触发，则时间显示为空)
 
       - name: Send Telegram notification on failure
-        # 仅在前面任何步骤失败时运行
         if: failure()
         uses: appleboy/telegram-action@master
         with:
