@@ -1,60 +1,60 @@
 name: Streamlit Daily Rebuild with Notification
 
 on:
-  schedule:
-    # 北京时间每日 3:00 和 15:00 (即 UTC 19:00 和 7:00)，每 12 小时运行一次
-    - cron: '0 7,19 * * *'
-  
-  # 允许您手动在 Actions 标签页触发此工作流
-  # 这行是让 "Run workflow" 按钮显示出来的关键
-  workflow_dispatch:
+  schedule:
+    # 北京时间每日 3:00 和 15:00 (即 UTC 19:00 和 7:00)，每 12 小时运行一次
+    - cron: '0 7,19 * * *'
+  
+  # 允许您手动在 Actions 标签页触发此工作流
+  # 这行是让 "Run workflow" 按钮显示出来的关键
+  workflow_dispatch:
 
 jobs:
-  rebuild:
-    runs-on: ubuntu-latest
+  rebuild:
+    runs-on: ubuntu-latest
 
-    # 必须添加此权限，才能让 action 推送（push）空提交
-    permissions:
-      contents: write
+    # 必须添加此权限，才能让 action 推送（push）空提交
+    permissions:
+      contents: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Git
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Create empty commit and push
-        run: |
-          # 创建一个空的 commit 并推送到远程仓库，以触发 Streamlit 重新部署
-          git commit --allow-empty -m "Trigger daily rebuild"
-          git push
+      - name: Create empty commit and push
+        run: |
+          # 创建一个空的 commit 并推送到远程仓库，以触发 Streamlit 重新部署
+          git commit --allow-empty -m "Trigger daily rebuild"
+          git push
 
-      - name: Send Telegram notification on success
-        # 仅在前面步骤都成功时运行
-        if: success()
-        uses: appleboy/telegram-action@master
-        with:
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          to: ${{ secrets.TELEGRAM_TO }}
-          message: |
-            ✅ Streamlit 应用重建任务成功！
-            
-            应用链接: https://axxsxx.streamlit.app/
-            触发时间: (UTC ${{ github.event.schedule }})
-            
-            (如果是手动触发，则时间显示为空)
+      - name: Send Telegram notification on success
+        # 仅在前面步骤都成功时运行
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            ✅ Streamlit 应用重建任务成功！
+            
+            应用链接: https://axxsxx.streamlit.app/
+            触发时间: (UTC ${{ github.event.schedule }})
+            
+            (如果是手动触发，则时间显示为空)
 
-      - name: Send Telegram notification on failure
-        # 仅在前面任何步骤失败时运行
-        if: failure()
-        uses: appleboy/telegram-action@master
-        with:
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          to: ${{ secrets.TELEGRAM_TO }}
-          message: |
-            ❌ Streamlit 应用重建任务失败！
-            
-            请检查 GitHub Actions 日志获取详情。
+      - name: Send Telegram notification on failure
+        # 仅在前面任何步骤失败时运行
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          to: ${{ secrets.TELEGRAM_TO }}
+          message: |
+            ❌ Streamlit 应用重建任务失败！
+            
+            请检查 GitHub Actions 日志获取详情。
